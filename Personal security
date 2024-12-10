@@ -1,0 +1,45 @@
+import java.sql.*;
+
+public class DatabaseManager {
+    private Connection connection;
+
+    public DatabaseManager() {
+        try {
+            connection = DriverManager.getConnection("jdbc:sqlite:emergency_contacts.db");
+            Statement stmt = connection.createStatement();
+            stmt.execute("CREATE TABLE IF NOT EXISTS contacts (id INTEGER PRIMARY KEY, name TEXT, phone TEXT, email TEXT)");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Add a new contact to the database
+    public void addContact(String name, String phone, String email) {
+        try {
+            String query = "INSERT INTO contacts (name, phone, email) VALUES (?, ?, ?)";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            pstmt.setString(1, name);
+            pstmt.setString(2, phone);
+            pstmt.setString(3, email);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // View all contacts in the database
+    public void viewContacts() {
+        try {
+            String query = "SELECT * FROM contacts";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("id") + ", Name: " + rs.getString("name") +
+                        ", Phone: " + rs.getString("phone") + ", Email: " + rs.getString("email"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
